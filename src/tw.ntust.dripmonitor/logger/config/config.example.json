@@ -1,0 +1,43 @@
+{
+  "production": {
+    "http_listen_host": "0.0.0.0",
+    "http_listen_port": 1191,
+
+    "stream_listen_host": "0.0.0.0",
+    "stream_listen_port": 11000,
+
+    "db_host": "127.0.0.1",
+    "db_port": 3306,
+    "db_username": "database_username",
+    "db_password": "database_password",
+    "db_name": "dripmonitor_logging"
+  },
+
+  "development": {
+    "http_listen_host": "0.0.0.0",
+    "http_listen_port": 1191,
+
+    "stream_listen_host": "0.0.0.0",
+    "stream_listen_port": 11000,
+
+    "db_host": "127.0.0.1",
+    "db_port": 3306,
+    "db_username": "database_username",
+    "db_password": "database_password",
+    "db_name": "dripmonitor_logging"
+  },
+
+  "test": {
+    "http_listen_host": "0.0.0.0",
+    "http_listen_port": 1191,
+
+    "stream_listen_host": "0.0.0.0",
+    "stream_listen_port": 11000,
+
+    "db_host": "127.0.0.1",
+    "db_port": 3306,
+    "db_username": "database_username",
+    "db_password": "database_password",
+    "db_name": "dripmonitor_logging"
+  }
+}
