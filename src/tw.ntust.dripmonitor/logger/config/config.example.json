@@ -2,7 +2,6 @@
   "production": {
     "http_listen_host": "0.0.0.0",
     "http_listen_port": 1191,
-
     "stream_listen_host": "0.0.0.0",
     "stream_listen_port": 11000,
 
@@ -16,7 +15,6 @@
   "development": {
     "http_listen_host": "0.0.0.0",
     "http_listen_port": 1191,
-
     "stream_listen_host": "0.0.0.0",
     "stream_listen_port": 11000,
 
@@ -30,7 +28,6 @@
   "test": {
     "http_listen_host": "0.0.0.0",
     "http_listen_port": 1191,
-
     "stream_listen_host": "0.0.0.0",
     "stream_listen_port": 11000,
 

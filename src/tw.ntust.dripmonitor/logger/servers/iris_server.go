@@ -7,6 +7,7 @@ import (
 	"github.com/kataras/iris/mvc"
 	"tw.ntust.dripmonitor/logger/web/controllers"
 	"tw.ntust.dripmonitor/logger/helpers"
+	"tw.ntust.dripmonitor/logger/dao"
 )
 
 func NewIrisApplication(config *helpers.Configuration, mysqlConn *helpers.MySQLConn) *iris.Application {
@@ -14,7 +15,7 @@ func NewIrisApplication(config *helpers.Configuration, mysqlConn *helpers.MySQLC
 	app.Logger().SetLevel("debug")
 	app.Use(logger.New())
 
-	registerRoutes(app)
+	registerRoutes(app, mysqlConn)
 
 	// Start the web server
 	app.Run(
@@ -27,7 +28,13 @@ func NewIrisApplication(config *helpers.Configuration, mysqlConn *helpers.MySQLC
 	return app
 }
 
-func registerRoutes(app *iris.Application) {
-	// Route: /
-	mvc.New(app.Party("/")).Handle(new(controllers.HomeController))
+func registerRoutes(app *iris.Application, mysqlConn *helpers.MySQLConn) {
+	eventLogDAO := dao.NewEventLogDAO(mysqlConn.DB)
+
+	mvc.New(app.Party("/")).
+		Handle(new(controllers.HomeController))
+
+	mvc.New(app.Party("/eventlog")).
+		Register(eventLogDAO).
+		Handle(new(controllers.EventLogController))
 }
