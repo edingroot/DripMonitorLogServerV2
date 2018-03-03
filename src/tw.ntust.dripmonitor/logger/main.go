@@ -1,12 +1,8 @@
 package main
 
 import (
-	"fmt"
-	"github.com/kataras/iris"
-	"github.com/kataras/iris/mvc"
-	"github.com/kataras/iris/middleware/logger"
-	"tw.ntust.dripmonitor/logger/web/controllers"
 	"tw.ntust.dripmonitor/logger/helpers"
+	"tw.ntust.dripmonitor/logger/servers"
 )
 
 var config *helpers.Configuration
@@ -31,23 +27,7 @@ func main() {
 	}
 	defer mysqlConn.Close()
 
-	// Initialize Iris app
-	app := iris.New()
-	app.Logger().SetLevel("debug")
-	app.Use(logger.New())
-
-	registerRoutes(app)
-
-	// Start the web server
-	app.Run(
-		iris.Addr(fmt.Sprintf("%s:%d", config.ListenHost, config.ListenPort)),
-		iris.WithoutVersionChecker, // disables updates
-		iris.WithoutServerError(iris.ErrServerClosed), // skip err server closed when CTRL/CMD+C pressed
-		iris.WithOptimizations, // enables faster json serialization and more
-	)
-}
-
-func registerRoutes(app *iris.Application) {
-	// Route: /
-	mvc.New(app.Party("/")).Handle(new(controllers.HomeController))
+	// Start servers
+	servers.InitializeTCPStream(config, mysqlConn) // tcp stream server
+	servers.NewIrisApplication(config, mysqlConn)  // http API server
 }

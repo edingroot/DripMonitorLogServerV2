@@ -3,4 +3,4 @@ $ export GOPATH=\`pwd\`
 $ go get -v ./..  
 $ go get -v ./..  
 $ go build ./...  
-$ ./bin/console  
+$ ./bin/logger  

@@ -24,13 +24,15 @@ type configRoot struct {
 }
 
 type runtimeEnv struct {
-	ListenHost  string  `json:"listen_host"`
-	ListenPort  int     `json:"listen_port"`
-	DbHost 	    string  `json:"db_host"`
-	DbPort      int     `json:"db_port"`
-	DbUsername  string  `json:"db_username"`
-	DbPassword  string  `json:"db_password"`
-	DbName      string  `json:"db_name"`
+	HttpListenHost    string  `json:"http_listen_host"`
+	HttpListenPort    int     `json:"http_listen_port"`
+	StreamListenHost  string  `json:"stream_listen_host"`
+	StreamListenPort  int     `json:"stream_listen_port"`
+	DbHost 	          string  `json:"db_host"`
+	DbPort            int     `json:"db_port"`
+	DbUsername        string  `json:"db_username"`
+	DbPassword        string  `json:"db_password"`
+	DbName            string  `json:"db_name"`
 }
 
 func NewConfiguration() (*Configuration, error) {
