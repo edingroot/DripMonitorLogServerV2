@@ -48,7 +48,7 @@ func NewConfiguration() (*Configuration, error) {
 		return nil, err
 	}
 
-	var mode string = os.Getenv(runtimeEnvKey)
+	mode := os.Getenv(runtimeEnvKey)
 	switch mode {
 	case "production":
 		config.runtimeEnv = configRoot.Production
