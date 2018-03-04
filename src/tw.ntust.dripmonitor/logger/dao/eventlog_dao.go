@@ -2,8 +2,8 @@ package dao
 
 import (
 	"database/sql"
-	"fmt"
 	"tw.ntust.dripmonitor/logger/datamodels"
+	log "github.com/sirupsen/logrus"
 )
 
 const LogTagELD = "[EventLogDAO]"
@@ -25,7 +25,7 @@ func (dao *EventLogDAO) InsertRecord(record *datamodels.EventRecord) bool {
 	query := "insert into event_log (event_code, message, mac_adapter, mac_drip, src_ip, src_port) values (?,?,?,?,?,?)"
 	stmtIns, err = dao.db.Prepare(query)
 	if err != nil {
-		fmt.Printf("%s Error preparing insert: %s\n", LogTagELD, err.Error())
+		log.Errorf("%s Error preparing insert: %s", LogTagELD, err.Error())
 		return false
 	}
 	defer stmtIns.Close()
@@ -33,7 +33,7 @@ func (dao *EventLogDAO) InsertRecord(record *datamodels.EventRecord) bool {
 	rs := record.SQLForm()
 	_, err = stmtIns.Exec(rs.EventCode, rs.Message, rs.AdapterMAC, rs.DripMAC, rs.SrcIP, rs.SrcPort)
 	if err != nil {
-		fmt.Printf("%s Error inserting record: %s\n", LogTagELD, err.Error())
+		log.Errorf("%s Error inserting record: %s", LogTagELD, err.Error())
 		return false
 	}
 

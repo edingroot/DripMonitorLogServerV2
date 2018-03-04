@@ -2,13 +2,13 @@ package servers
 
 import (
 	"bufio"
-	"log"
 	"net"
 	"tw.ntust.dripmonitor/logger/helpers"
-	"fmt"
 	"tw.ntust.dripmonitor/logger/dao"
 	"strings"
 	"strconv"
+	log "github.com/sirupsen/logrus"
+	"fmt"
 )
 
 const LogTagTS = "[TCPStream]"
@@ -31,13 +31,13 @@ func InitializeTCPStream(config *helpers.Configuration, mysqlConn *helpers.MySQL
 	streamLogDAO := dao.NewStreamLogDAO(mysqlConn.DB)
 	address := fmt.Sprintf("%s:%d", config.StreamListenHost, config.StreamListenPort)
 
-	fmt.Printf("%s Creating tcp server...\n", LogTagTS)
+	log.Infof("%s Creating tcp server...", LogTagTS)
 	server := &TcpServer{
 		address: address,
 	}
 
 	server.OnNewClient(func(c *TcpClient) {
-		fmt.Printf("%s New client connected: %s\n", LogTagTS, c.conn.RemoteAddr().String())
+		log.Infof("%s New client connected: %s", LogTagTS, c.conn.RemoteAddr().String())
 	})
 
 	server.OnNewMessage(func(c *TcpClient, message string) {
@@ -45,20 +45,17 @@ func InitializeTCPStream(config *helpers.Configuration, mysqlConn *helpers.MySQL
 		srcIp := s[0]
 		srcPort, _ := strconv.Atoi(s[1])
 
-		fmt.Printf("%s Received message from %s:%d, length=%d\n", LogTagTS, srcIp, srcPort, len(message))
+		log.Infof("%s Received message from %s:%d, length=%d", LogTagTS, srcIp, srcPort, len(message))
 		streamLogDAO.InsertRecord(message, srcIp, srcPort)
 	})
 
 	server.OnClientConnectionClosed(func(c *TcpClient, err error) {
-		if err != nil {
-			fmt.Printf("%s TCP streaming server %s\n", LogTagTS, err.Error())
-		}
-		fmt.Printf("%s Client disconnected: %s\n", LogTagTS, c.conn.RemoteAddr().String())
+		log.Infof("%s Client disconnected: %s", LogTagTS, c.conn.RemoteAddr().String())
 	})
 
 	go server.Listen()
 
-	fmt.Printf("%s TCP streaming server now listening on %s\n", LogTagTS, address)
+	log.Infof("%s TCP streaming server now listening on %s", LogTagTS, address)
 
 	return server
 }
@@ -69,7 +66,7 @@ func (c *TcpClient) listen() {
 	for {
 		message, err := reader.ReadString('\n')
 		if err != nil {
-			fmt.Printf("%s Failed to read from tcp client: %s\n", LogTagTS, err.Error())
+			log.Warnf("%s Failed to read from tcp client: %s", LogTagTS, err.Error())
 			c.conn.Close()
 			c.Server.onClientConnectionClosed(c, err)
 			return

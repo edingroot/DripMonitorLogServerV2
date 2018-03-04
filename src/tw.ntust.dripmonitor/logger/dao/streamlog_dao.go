@@ -2,7 +2,7 @@ package dao
 
 import (
 	"database/sql"
-	"fmt"
+	log "github.com/sirupsen/logrus"
 )
 
 const LogTagSLD = "[StreamLogDAO]"
@@ -24,14 +24,14 @@ func (dao *StreamLogDAO) InsertRecord(message string, srcIp string, srcPort int)
 	query := "insert into tcp_log_stream (message, src_ip, src_port) values (?,?,?)"
 	stmtIns, err = dao.db.Prepare(query)
 	if err != nil {
-		fmt.Printf("%s Error preparing insert: %s\n", LogTagSLD, err.Error())
+		log.Errorf("%s Error preparing insert: %s", LogTagSLD, err.Error())
 		return false
 	}
 	defer stmtIns.Close()
 
 	_, err = stmtIns.Exec(message, srcIp, srcPort)
 	if err != nil {
-		fmt.Printf("%s Error inserting record: %s\n", LogTagSLD, err.Error())
+		log.Errorf("%s Error inserting record: %s", LogTagSLD, err.Error())
 		return false
 	}
 

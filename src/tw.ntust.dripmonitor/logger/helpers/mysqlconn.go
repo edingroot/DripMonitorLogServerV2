@@ -16,7 +16,8 @@ func NewMySQLConn(config *Configuration) (*MySQLConn, error) {
 	var conn MySQLConn
 	var err error
 
-	conn.DB, err = sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?multiStatements=true",
+	conn.DB, err = sql.Open("mysql",
+		fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true&multiStatements=true",
 		config.DbUsername, config.DbPassword, config.DbHost, config.DbPort, config.DbName))
 	if err != nil {
 		return nil, errors.New("Filed to open MySQL connection")

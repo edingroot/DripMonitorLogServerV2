@@ -5,7 +5,7 @@ import (
 	"os"
 	"encoding/json"
 	"io/ioutil"
-	"fmt"
+	log "github.com/sirupsen/logrus"
 )
 
 // Path is related to project root
@@ -60,12 +60,11 @@ func NewConfiguration() (*Configuration, error) {
 		config.runtimeEnv = configRoot.Test
 
 	default:
-		// TODO: use logging library
-		fmt.Println("Warning: " + runtimeEnvKey + " not set.")
+		log.Warnln("Warning: " + runtimeEnvKey + " not set.")
 		mode = "production"
 		config.runtimeEnv = configRoot.Production
 	}
-	fmt.Println("Running on " + mode + " mode.")
+	log.Infoln("Running in " + mode + " mode.")
 
 	return &config, nil
 }

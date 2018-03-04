@@ -12,7 +12,7 @@ import (
 
 func NewIrisApplication(config *helpers.Configuration, mysqlConn *helpers.MySQLConn) *iris.Application {
 	app := iris.New()
-	app.Logger().SetLevel("debug")
+	app.Logger().SetLevel("info")
 	app.Use(logger.New())
 
 	registerRoutes(app, mysqlConn)
