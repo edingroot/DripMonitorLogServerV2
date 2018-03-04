@@ -7,6 +7,8 @@ import (
 	"tw.ntust.dripmonitor/logger/dao"
 )
 
+const LogTagEC = "[EventLogController]"
+
 type EventLogController struct{
 	Ctx iris.Context
 	EventLogDAO *dao.EventLogDAO
@@ -18,12 +20,20 @@ func (c *EventLogController) Get() {
 
 func (c *EventLogController) Post() {
 	param := datamodels.EventRecord{}
+	form := &c.Ctx.Request().Form
 
-	err := c.Ctx.ReadForm(&param)
+	// Read form inputs
+	err := c.Ctx.ReadForm(&param) // form (map) got filled after this
 	if err != nil {
-		fmt.Println(param)
+		fmt.Printf("%s Problem reading form: %s\n", LogTagEC, err.Error())
+		fmt.Printf("%s Request payload: %s\n", LogTagEC, form)
+		fmt.Printf("%s Continue processing\n", LogTagEC)
+	}
+
+	// Check necessary inputs
+	if form.Get("mac_adapter") == "" || form.Get("event_code") == "" {
+		fmt.Printf("%s Bad request, payload: %s\n", LogTagEC, form)
 		c.Ctx.StatusCode(iris.StatusBadRequest)
-		c.Ctx.WriteString(err.Error())
 		return
 	}
 
