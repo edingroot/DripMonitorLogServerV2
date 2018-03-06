@@ -42,6 +42,6 @@ func main() {
 func initConsoleLogger() {
 	log.SetFormatter(&logrus.TextFormatter{
 		ForceColors: true, FullTimestamp: true, TimestampFormat: helpers.TimeFormat})
-	log.SetLevel(logrus.InfoLevel)
+	log.SetLevel(logrus.DebugLevel)
 	log.SetOutput(os.Stdout)
 }

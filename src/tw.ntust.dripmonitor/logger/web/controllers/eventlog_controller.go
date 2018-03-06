@@ -6,7 +6,6 @@ import (
 	"tw.ntust.dripmonitor/logger/dao"
 	log "github.com/sirupsen/logrus"
 	"tw.ntust.dripmonitor/logger/helpers"
-	"fmt"
 )
 
 const LogTagEC = "[EventLogController]"
@@ -60,19 +59,21 @@ func (c *EventLogController) GetAdapterBy(adapterMAC string, route string) {
 
 // Get: /eventlog/adapter/<AdapterMAC>/need_restart
 func (c *EventLogController) adapterNeedRestart(adapterMAC string) {
+	const LookupCount = 10
 	response := make(map[string]interface{})
 	response["proc_status"] = 1
 	response["need_restart"] = false
 
-	btConnectRecords := c.EventLogDAO.GetAdapterConnectsAfterRestart(adapterMAC, 5)
+	btConnectRecords := c.EventLogDAO.GetAdapterConnectsAfterRestart(adapterMAC, LookupCount)
 
 	// Check if event code of all record is 30
-	if len(*btConnectRecords) < 5 {
+	log.Debugf("[isAdapterNeedRestart] %s - count{30,31}=%d", adapterMAC, len(*btConnectRecords))
+	if len(*btConnectRecords) < LookupCount {
 		c.Ctx.JSON(response)
 		return
 	} else {
 		for _, record := range *btConnectRecords {
-			fmt.Printf("%s - %d\n", adapterMAC, record.EventCode)
+			log.Debugf("[isAdapterNeedRestart] %s - %d", adapterMAC, record.EventCode)
 			if record.EventCode != 30 {
 				c.Ctx.JSON(response)
 				return

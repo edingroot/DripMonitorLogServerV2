@@ -40,9 +40,10 @@ func (d *EventLogDAO) InsertRecord(record *datamodels.EventLog) bool {
 func (d *EventLogDAO) GetAdapterConnectsAfterRestart(adapterMAC string, recordCount int) *[]datamodels.EventLogSQL {
 	errorResult := &[]datamodels.EventLogSQL{}
 
-	// Find timestamp of the last boot_record
+	// Find timestamp of the last boot_record within 10 minutes
 	var lastBootTime time.Time
-	query := "select created_at from event_log where mac_adapter=? and event_code=52 order by created_at desc limit 1"
+	query := "select created_at from event_log where mac_adapter=? and event_code=52 " +
+		"order by created_at desc limit 1"
 	err := d.db.QueryRow(query, adapterMAC).Scan(&lastBootTime)
 	if err != nil {
 		d.logError(err); return errorResult
@@ -50,7 +51,7 @@ func (d *EventLogDAO) GetAdapterConnectsAfterRestart(adapterMAC string, recordCo
 
 	// Query records related to bluetooth connects
 	query = "select * from event_log where mac_adapter=? and event_code in (30, 31) " +
-		"and created_at >= ? order by created_at desc limit ?"
+		"and created_at >= greatest(?, date_sub(now(), interval 10 minute)) order by created_at desc limit ?"
 	stmt, err := d.db.Prepare(query)
 	if err != nil {
 		d.logError(err); return errorResult
