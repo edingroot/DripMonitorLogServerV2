@@ -4,6 +4,8 @@ import (
 	"runtime"
 	"path"
 	"database/sql"
+	"strings"
+	"strconv"
 )
 
 const TimeFormat = "2006-01-02 15:04:05"
@@ -17,6 +19,13 @@ func InitializePaths() {
 	} else {
 		ProjectPath = path.Join(path.Dir(filename), "../")
 	}
+}
+
+func GetIpPortFromAddr(remoteAddr string) (string, int32) {
+	s := strings.Split(remoteAddr, ":")
+	srcIp := s[0]
+	srcPort, _ := strconv.Atoi(s[1])
+	return srcIp, int32(srcPort)
 }
 
 func StringToNullString(s string) sql.NullString {

@@ -5,8 +5,6 @@ import (
 	"net"
 	"tw.ntust.dripmonitor/logger/helpers"
 	"tw.ntust.dripmonitor/logger/dao"
-	"strings"
-	"strconv"
 	log "github.com/sirupsen/logrus"
 	"fmt"
 )
@@ -41,9 +39,7 @@ func InitializeTCPStream(config *helpers.Configuration, mysqlConn *helpers.MySQL
 	})
 
 	server.OnNewMessage(func(c *TcpClient, message string) {
-		s := strings.Split(c.conn.RemoteAddr().String(), ":")
-		srcIp := s[0]
-		srcPort, _ := strconv.Atoi(s[1])
+		srcIp, srcPort := helpers.GetIpPortFromAddr(c.conn.RemoteAddr().String())
 
 		log.Infof("%s Received message from %s:%d, length=%d", LogTagTS, srcIp, srcPort, len(message))
 		streamLogDAO.InsertRecord(message, srcIp, srcPort)

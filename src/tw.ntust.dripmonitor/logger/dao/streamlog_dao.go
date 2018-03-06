@@ -17,7 +17,7 @@ func NewStreamLogDAO(db *sql.DB) *StreamLogDAO {
 	}
 }
 
-func (dao *StreamLogDAO) InsertRecord(message string, srcIp string, srcPort int) bool {
+func (dao *StreamLogDAO) InsertRecord(message string, srcIp string, srcPort int32) bool {
 	var err error
 	var stmtIns *sql.Stmt
 

@@ -13,7 +13,7 @@ type EventRecord struct {
 	AdapterMAC    string    `json:"mac_adapter" form:"mac_adapter"`
 	DripMAC       string    `json:"mac_drip" form:"mac_drip"`
 	SrcIP         string    `json:"src_ip"`
-	SrcPort       int64     `json:"src_port"`
+	SrcPort       int32     `json:"src_port"`
 	CreatedAt     time.Time `json:"created_at"`
 }
 
@@ -36,7 +36,7 @@ func (r *EventRecord) SQLForm() *EventRecordSQL {
 		helpers.StringToNullString(r.AdapterMAC),
 		helpers.StringToNullString(r.DripMAC),
 		helpers.StringToNullString(r.SrcIP),
-		helpers.Int64ToNullInt64(r.SrcPort),
+		helpers.Int64ToNullInt64(int64(r.SrcPort)),
 		r.CreatedAt,
 	}
 }

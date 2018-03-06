@@ -5,6 +5,7 @@ import (
 	"tw.ntust.dripmonitor/logger/datamodels"
 	"tw.ntust.dripmonitor/logger/dao"
 	log "github.com/sirupsen/logrus"
+	"tw.ntust.dripmonitor/logger/helpers"
 )
 
 const LogTagEC = "[EventLogController]"
@@ -36,6 +37,9 @@ func (c *EventLogController) Post() {
 		c.Ctx.StatusCode(iris.StatusBadRequest)
 		return
 	}
+
+	// Log IP & port
+	param.SrcIP, param.SrcPort = helpers.GetIpPortFromAddr(c.Ctx.Request().RemoteAddr)
 
 	c.EventLogDAO.InsertRecord(&param)
 	c.Ctx.JSON(iris.Map{"proc_status": 1})
