@@ -3,10 +3,11 @@ package datamodels
 import (
 	"time"
 	"database/sql"
+	"tw.ntust.dripmonitor/logger/helpers"
 )
 
 type EventRecord struct {
-	SN            int64     `json:"sn"`
+	SN            int32     `json:"sn"`
 	EventCode     int       `json:"event_code" form:"event_code"`
 	Message       string    `json:"message" form:"message"`
 	AdapterMAC    string    `json:"mac_adapter" form:"mac_adapter"`
@@ -17,10 +18,10 @@ type EventRecord struct {
 }
 
 type EventRecordSQL struct {
-	SN            int64
+	SN            int32
 	EventCode     int
 	Message       sql.NullString
-	AdapterMAC    string
+	AdapterMAC    sql.NullString
 	DripMAC       sql.NullString
 	SrcIP         sql.NullString
 	SrcPort       sql.NullInt64
@@ -28,37 +29,15 @@ type EventRecordSQL struct {
 }
 
 func (r *EventRecord) SQLForm() *EventRecordSQL {
-	rs := &EventRecordSQL{
+	return &EventRecordSQL{
 		r.SN,
 		r.EventCode,
-		sql.NullString{r.Message, true},
-		r.AdapterMAC,
-		sql.NullString{r.DripMAC, true},
-		sql.NullString{r.SrcIP, true},
-		sql.NullInt64{r.SrcPort, true},
+		helpers.StringToNullString(r.Message),
+		helpers.StringToNullString(r.AdapterMAC),
+		helpers.StringToNullString(r.DripMAC),
+		helpers.StringToNullString(r.SrcIP),
+		helpers.Int64ToNullInt64(r.SrcPort),
 		r.CreatedAt,
 	}
-
-	// Handle null values
-	if len(rs.Message.String) == 0 {
-		rs.Message.Valid = false
-	}
-	if len(rs.DripMAC.String) == 0 {
-		rs.DripMAC.Valid = false
-	}
-	if len(rs.SrcIP.String) == 0 {
-		rs.SrcIP.Valid = false
-	}
-	if rs.SrcPort.Int64 == 0 {
-		rs.SrcPort.Valid = false
-	}
-
-	return rs
 }
-
-// IsValid can do some very very simple "low-level" data validations.
-//func (u User) IsValid() bool {
-//	return u.ID > 0
-//}
-
 

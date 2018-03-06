@@ -38,6 +38,7 @@ func main() {
 
 	log.Infoln("Cleaning up...")
 }
+
 func initConsoleLogger() {
 	log.SetFormatter(&logrus.TextFormatter{
 		ForceColors: true, FullTimestamp: true, TimestampFormat: helpers.TimeFormat})

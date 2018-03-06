@@ -1,6 +1,5 @@
 ## Build & Run
 $ export GOPATH=\`pwd\`  
-$ go get -v ./...  
-$ go get -v ./...  
-$ go install ./...  
-$ ./bin/logger  
+$ go get -d -v tw.ntust.dripmonitor/logger  
+$ go install tw.ntust.dripmonitor/logger  
+$ ./bin/logger
