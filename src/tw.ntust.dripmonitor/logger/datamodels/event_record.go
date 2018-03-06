@@ -6,7 +6,7 @@ import (
 	"tw.ntust.dripmonitor/logger/helpers"
 )
 
-type EventRecord struct {
+type EventLog struct {
 	SN            int32     `json:"sn"`
 	EventCode     int       `json:"event_code" form:"event_code"`
 	Message       string    `json:"message" form:"message"`
@@ -17,7 +17,7 @@ type EventRecord struct {
 	CreatedAt     time.Time `json:"created_at"`
 }
 
-type EventRecordSQL struct {
+type EventLogSQL struct {
 	SN            int32
 	EventCode     int
 	Message       sql.NullString
@@ -28,8 +28,8 @@ type EventRecordSQL struct {
 	CreatedAt     time.Time
 }
 
-func (r *EventRecord) SQLForm() *EventRecordSQL {
-	return &EventRecordSQL{
+func (r *EventLog) SQLForm() *EventLogSQL {
+	return &EventLogSQL{
 		r.SN,
 		r.EventCode,
 		helpers.StringToNullString(r.Message),

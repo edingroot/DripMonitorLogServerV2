@@ -6,6 +6,7 @@ import (
 	"tw.ntust.dripmonitor/logger/dao"
 	log "github.com/sirupsen/logrus"
 	"tw.ntust.dripmonitor/logger/helpers"
+	"fmt"
 )
 
 const LogTagEC = "[EventLogController]"
@@ -19,8 +20,9 @@ func (c *EventLogController) Get() {
 	c.Ctx.Writef("EventLogController")
 }
 
+// Insert a event record
 func (c *EventLogController) Post() {
-	param := datamodels.EventRecord{}
+	param := datamodels.EventLog{}
 	form := &c.Ctx.Request().Form
 
 	// Read form inputs
@@ -43,4 +45,41 @@ func (c *EventLogController) Post() {
 
 	c.EventLogDAO.InsertRecord(&param)
 	c.Ctx.JSON(iris.Map{"proc_status": 1})
+}
+
+// Get: /eventlog/adapter/<AdapterMAC>/<Route>
+func (c *EventLogController) GetAdapterBy(adapterMAC string, route string) {
+	switch route {
+	case "need_restart":
+		c.adapterNeedRestart(adapterMAC)
+
+	default:
+		c.Ctx.StatusCode(iris.StatusBadRequest)
+	}
+}
+
+// Get: /eventlog/adapter/<AdapterMAC>/need_restart
+func (c *EventLogController) adapterNeedRestart(adapterMAC string) {
+	response := make(map[string]interface{})
+	response["proc_status"] = 1
+	response["need_restart"] = false
+
+	btConnectRecords := c.EventLogDAO.GetAdapterConnectsAfterRestart(adapterMAC, 5)
+
+	// Check if event code of all record is 30
+	if len(*btConnectRecords) < 5 {
+		c.Ctx.JSON(response)
+		return
+	} else {
+		for _, record := range *btConnectRecords {
+			fmt.Printf("%s - %d\n", adapterMAC, record.EventCode)
+			if record.EventCode != 30 {
+				c.Ctx.JSON(response)
+				return
+			}
+		}
+
+		response["need_restart"] = true
+		c.Ctx.JSON(response)
+	}
 }
