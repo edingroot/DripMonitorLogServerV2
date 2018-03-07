@@ -65,10 +65,11 @@ func (c *EventLogController) adapterNeedRestart(adapterMAC string) {
 	response["proc_status"] = 1
 	response["need_restart"] = false
 
-	// Check count of event21 which message is null (cached drip device list is empty)
+	// Check count of event21 which message is not null (cached drip device list is empty)
 	emptyDripListCount := c.EventLogDAO.GetAdapterEmptyDripListCount(adapterMAC, LookupCount21)
 	log.Debugf("[isAdapterNeedRestart] count{21empty}=%d", emptyDripListCount)
-	if emptyDripListCount == LookupCount21 {
+	if emptyDripListCount == 30 {
+		// Message field of all records are null
 		log.Infof("[isAdapterNeedRestart] %s - YES", adapterMAC)
 		response["need_restart"] = true
 		c.Ctx.JSON(response)

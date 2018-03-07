@@ -89,22 +89,21 @@ func (d *EventLogDAO) GetAdapterEmptyDripListCount(adapterMAC string, recordCoun
 	}
 
 	// Query matched records within 10 minutes
-	query := "select * from event_log where mac_adapter=? and event_code=21 and message is null " +
-		"and created_at >= greatest(?, date_sub(now(), interval 10 minute)) order by created_at desc limit ?"
+	query := "select count(t1.sn) from ( " +
+				"select sn, message from event_log where event_code=21 and mac_adapter=? " +
+				"and created_at >= greatest(?, date_sub(now(), interval 10 minute)) order by created_at desc limit ? " +
+			 ") as t1 where t1.message is null group by t1.message"
 	stmt, err := d.db.Prepare(query)
 	if err != nil {
 		d.logError(err); return 0
 	}
 	defer stmt.Close()
-	rows, err := stmt.Query(adapterMAC, lastBootTime, recordCount)
-	if err != nil {
-		d.logError(err); return 0
-	}
 
-	// Rows count
-	count := 0
-	for rows.Next() {
-		count++
+	var count int
+	err = stmt.QueryRow(adapterMAC, lastBootTime, recordCount).Scan(&count)
+	if err != nil {
+		// Could caused by no row returned
+		return 0
 	}
 
 	return count
