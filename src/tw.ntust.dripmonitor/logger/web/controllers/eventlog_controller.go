@@ -64,22 +64,34 @@ func (c *EventLogController) adapterNeedRestart(adapterMAC string) {
 	response["proc_status"] = 1
 	response["need_restart"] = false
 
-	btConnectRecords := c.EventLogDAO.GetAdapterConnectsAfterRestart(adapterMAC, LookupCount)
+	// Check count of event21 which message is null (cached drip device list is empty)
+	emptyDripListCount := c.EventLogDAO.GetAdapterEmptyDripListCount(adapterMAC, LookupCount)
+	log.Debugf("[isAdapterNeedRestart] count{21empty}=%d", emptyDripListCount)
+	if emptyDripListCount == LookupCount {
+		log.Infof("[isAdapterNeedRestart] %s - YES", adapterMAC)
+		response["need_restart"] = true
+		c.Ctx.JSON(response)
+		return
+	}
 
-	// Check if event code of all record is 30
-	log.Debugf("[isAdapterNeedRestart] %s - count{30,31}=%d", adapterMAC, len(*btConnectRecords))
+	// Check if event code of all drip connects record is 30
+	btConnectRecords := c.EventLogDAO.GetAdapterDripConnectsAfterRestart(adapterMAC, LookupCount)
+	log.Debugf("[isAdapterNeedRestart] count{30,31}=%d", len(*btConnectRecords))
 	if len(*btConnectRecords) < LookupCount {
+		response["need_restart"] = false
 		c.Ctx.JSON(response)
 		return
 	} else {
 		for _, record := range *btConnectRecords {
-			log.Debugf("[isAdapterNeedRestart] %s - %d", adapterMAC, record.EventCode)
+			log.Debugf("[isAdapterNeedRestart] seq - %d", record.EventCode)
 			if record.EventCode != 30 {
+				response["need_restart"] = false
 				c.Ctx.JSON(response)
 				return
 			}
 		}
 
+		log.Infof("[isAdapterNeedRestart] %s - YES", adapterMAC)
 		response["need_restart"] = true
 		c.Ctx.JSON(response)
 	}
